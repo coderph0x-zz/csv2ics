@@ -55,7 +55,7 @@ def main():
             startdate=time.strftime("%Y%m%d",time.gmtime(time.mktime(time.strptime(leerung[0],"%d.%m.%Y"))))
             enddate=time.strftime("%Y%m%d",time.gmtime(time.mktime(time.strptime(leerung[0],"%d.%m.%Y"))+86400))
         
-            icsfile.write("UID:collection"+startdate+"@csv2ics\n")
+            icsfile.write("UID:Leerung"+startdate+"@csv2ics\n")
             icsfile.write("SUMMARY:"+leerung[1]+"\n")
             icsfile.write("DTSTART;VALUE=DATE:"+startdate+"\n")
             icsfile.write("DTEND;VALUE=DATE:"+enddate+"\n")
