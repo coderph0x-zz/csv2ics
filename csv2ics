@@ -13,7 +13,8 @@ def str_replace(string):
             "gelb":"Recycling",
             "grau":"Restmüll",
             "grün":"Grünschnitt",
-            "rot":"Schadstoffsammlung"
+            "rot":"Schadstoffsammlung",
+            "weiss":"Altglas"
             }
     return switcher.get(string,"Was anderes")
 
