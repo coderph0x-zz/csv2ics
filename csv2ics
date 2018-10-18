@@ -1,0 +1,68 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*
+
+import io
+import csv
+import sys
+import time
+
+def str_replace(string):
+    switcher = {
+            "blau":"Papier",
+            "braun":"Biotonne",
+            "gelb":"Recycling",
+            "grau":"Restmüll",
+            "grün":"Grünschnitt",
+            "rot":"Schadstoffsammlung"
+            }
+    return switcher.get(string,"Was anderes")
+
+def main():
+
+    with open(sys.argv[1],'rb') as csvfile:
+        data = list(csv.reader(csvfile, delimiter=';'))
+
+    leerungen = []
+
+    for leerung in data:
+        if not '1.100 Liter' in leerung:
+            if not 'Farbe' in leerung:
+                insert = True
+                for termine in leerungen:
+                    if leerung[2] == termine[0]:
+                        insert = False
+                        termine[1] = termine[1]+" & "+str_replace(leerung[0])
+                if insert:
+                    leerungen.append([leerung[2],str_replace(leerung[0])])
+
+    with open(sys.argv[2],'w') as icsfile:
+        icsfile.write("BEGIN:VCALENDAR\n")
+        icsfile.write("VERSION:2.0\n")
+        icsfile.write("CALSCALE:GREGORIAN\n")
+        icsfile.write("PRODID:-//coderph0x//csv2ics//DE\n")
+        icsfile.write("X-WR-CALNAME:Müllabfuhr\n")
+        icsfile.write("X-APPLE-CALENDAR-COLOR:#e77474\n")
+
+        for leerung in leerungen:
+            icsfile.write("BEGIN:VEVENT\n")
+        
+            now=time.strftime("%Y%m%dT%H%M%S",time.localtime())
+
+            icsfile.write("CREATED:"+now+"\n")
+            icsfile.write("DTSTAMP:"+now+"\n")
+            icsfile.write("LAST-MODIFIED:"+now+"\n")
+
+            startdate=time.strftime("%Y%m%d",time.gmtime(time.mktime(time.strptime(leerung[0],"%d.%m.%Y"))))
+            enddate=time.strftime("%Y%m%d",time.gmtime(time.mktime(time.strptime(leerung[0],"%d.%m.%Y"))+86400))
+        
+            icsfile.write("UID:collection"+startdate+"@csv2ics\n")
+            icsfile.write("SUMMARY:"+leerung[1]+"\n")
+            icsfile.write("DTSTART;VALUE=DATE:"+startdate+"\n")
+            icsfile.write("DTEND;VALUE=DATE:"+enddate+"\n")
+            icsfile.write("END:VEVENT\n")
+
+        icsfile.write("END:VCALENDAR\n")
+        icsfile.close()
+
+if __name__ == '__main__':
+    main()
